@@ -18,6 +18,7 @@ export  class Settings extends Component {
 
   render() {
       return <View>
+          <Text>Selected language</Text>
           <Picker selectedValue={this.state.region} onValueChange={itemValue => this._setData(itemValue)}>
             {this.state.regions.map(
               (region, index) => (
@@ -29,6 +30,7 @@ export  class Settings extends Component {
               )
             )}
           </Picker>
+
         </View>;
    }
    componentDidMount(){
