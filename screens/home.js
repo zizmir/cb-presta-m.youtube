@@ -5,7 +5,8 @@ import { StyleSheet,
         Image ,
         ScrollView ,
         TouchableOpacity ,
-        TextInput
+        TextInput,
+        AsyncStorage
       } from 'react-native';
 
 import { CONFIG } from '../constants'
@@ -22,9 +23,14 @@ export  class Home extends React.Component {
               <TouchableOpacity>
                <Image source={require("../assets/logo.png")} style={{ marginLeft: 10 }} />
              </TouchableOpacity>, headerRight: <View style={{ flexDirection: "row", marginRight: 30 }}>
-             <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+
+
+             <TouchableOpacity style={{ paddingHorizontal: 5 }}
+              onPress={() => state.params.random()}>
                <Image style={{ width: 20, height: 20 }} source={require("../assets/icons/hashtag.png")} />
              </TouchableOpacity>
+
+
              <TouchableOpacity style={{ paddingHorizontal: 5 }}>
                <Image style={{ width: 20, height: 20 }} source={require("../assets/icons/love.png")} />
              </TouchableOpacity>
@@ -48,14 +54,12 @@ export  class Home extends React.Component {
     this.state = {
       movies: [],
       search : false,
-      textSearch : null
+      textSearch : null,
+       Country:"France",
     }
   }
 
   _search = () => {
-
-    // this.setState({check: !this.state.search})
-    console.log(this.state.search)
     this.setState(prevState => ({
       search: !prevState.search
     }));
@@ -81,6 +85,38 @@ export  class Home extends React.Component {
       console.error(error);
     })
   }
+  _randomCountry =(() =>{
+      this.setState({
+         video: [] ,
+         Country : ""
+      })
+      // var countries =
+      console.log(countries)
+       var randCountry = countries[Math.floor(Math.random() * countries.length)];
+       const countryId = randCountry.id;
+      const countryName = randCountry.snippet.name
+
+       const qp = "&part=snippet,id&order=rating&maxResults=20&chart=mostPopular";
+       const { BASE_URL, API_KEY } = CONFIG.YOUTUBE;
+       const videoRandom = [];
+
+       fetch(`${BASE_URL}/search?key=${API_KEY}${qp}&regionCode=${countryId}`)
+         .then(res => res.json())
+
+         .then(res => {
+           res.items.forEach(v => {
+             videoRandom.push(v);
+           });
+
+
+           this.setState({
+             video : videoRandom,
+             Country : countryName
+           });
+
+        });
+                     }
+  )
 
   _toggleSearch()
   {
@@ -149,7 +185,20 @@ export  class Home extends React.Component {
     })
 
   }
-
+  componentWillMount() {
+    try {
+      const result = AsyncStorage.getItem(CONFIG.STORAGE.AVAILABLE_REGIONS).then(
+        result => {
+          if (result) {
+            countries = JSON.parse(result);
+            this.setState({ countries });
+          }
+        }
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
   componentDidMount(){
     const { BASE_URL , API_KEY } = CONFIG.YOUTUBE
 
@@ -157,7 +206,8 @@ export  class Home extends React.Component {
     this._fetchForHomeStart(BASE_URL, API_KEY )
     // Parti affichage du textInput
     this.props.navigation.setParams({
-      search: this._search
+      search: this._search,
+      random: this._randomCountry
     })
   }
 

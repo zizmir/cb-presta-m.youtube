@@ -1,7 +1,7 @@
 export const CONFIG = {
   STORAGE: {
     AVAILABLE_REGIONS: '@availabe_regions',
-    CURRENT_REGION: 'French'
+    CURRENT_REGION: '@current_region'
   },
   YOUTUBE: {
     BASE_URL: 'https://www.googleapis.com/youtube/v3',
